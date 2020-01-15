@@ -1,0 +1,8 @@
+beautifulsoup4==4.8.2
+certifi==2019.11.28
+html2text==2019.9.26
+lxml==4.4.2
+py4j==0.10.7
+pyspark==2.4.4
+soupsieve==1.9.5
+wincertstore==0.2
