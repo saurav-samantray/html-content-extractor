@@ -29,7 +29,7 @@ class WikiExtractor(BaseExtractor):
 
 		#get body dump
 		paragraphdump = self.getparagraphdump(soup)
-		wikidict['paragraphdump'] = paragraphdump
+		wikidict['paragraphdump'] = str(paragraphdump.encode("ascii", "ignore"),'utf-8')
 
 		#populate the wiki info table content
 		self.populatetabledata(soup,wikidict)

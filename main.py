@@ -8,10 +8,12 @@ import json
 
 from templates.crunchbase import extractor as crunchextract
 from templates.wikipedia import extractor as wikiextract
+from templates.yahoo import extractor as yahooextractor
 
 
 conf = SparkConf().setMaster("local").setAppName(config.APP_NAME)
 sc = SparkContext(conf = conf)
+sc.setLogLevel("WARN")
 
 stime = time.time()
 print("Current encoding : "+sys.getdefaultencoding())
@@ -54,6 +56,10 @@ for key, value in sortedResults.items():
 			crunchbase = crunchextract.CrunchbaseExtractor()
 			crunchdict = crunchbase.extract(soup)
 			retailerdict['crunchbase']=crunchdict
+		elif source in ['yahoonews', 'yahoofinance']:
+			yahoo = yahooextractor.YahooExtractor()
+			yahoodict = yahoo.extract(soup)
+			retailerdict['yahoo']=yahoodict
 			#print(crunchdict)
 	with open('output/'+key+'.json', 'w') as fp:
 		json.dump(retailerdict, fp,indent=4)

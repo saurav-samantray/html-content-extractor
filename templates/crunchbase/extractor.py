@@ -40,12 +40,15 @@ class CrunchbaseExtractor(BaseExtractor):
 			descriptiondict = {}
 			smalldescription = soup.find('span',attrs={"class":"component--field-formatter field-type-text_long ng-star-inserted"})
 			if smalldescription is not None:
-				descriptiondict['smalldescription'] = smalldescription.get_text(strip=True)
+				#descriptiondict['smalldescription'] = smalldescription.get_text(strip=True)
+				descriptiondict['smalldescription'] = str(smalldescription.get_text(strip=True).encode("ascii", "ignore"),"utf-8")
+				
 				#print(smalldescription.get_text(strip=True))
 
 			longdescription = soup.find('description-card')
 			if longdescription is not None:
-				descriptiondict['longdescription'] = longdescription.get_text(strip=True)
+				#descriptiondict['longdescription'] = longdescription.get_text(strip=True)
+				descriptiondict['longdescription'] = str(longdescription.get_text(strip=True).encode("ascii", "ignore"),'utf-8')
 				#print(longdescription.get_text(strip=True))
 			crunchdict.update(descriptiondict)
 
