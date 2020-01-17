@@ -1,4 +1,5 @@
 from templates.base import BaseExtractor
+import re
 import config
 
 class WikiExtractor(BaseExtractor):
@@ -7,7 +8,7 @@ class WikiExtractor(BaseExtractor):
 		content = soup.find('div',attrs={'id':'mw-content-text'})
 		if content is not None:
 			paras_el = content.find_all('p')
-			paras = [i.get_text(strip=False) for i in paras_el]
+			paras = [re.sub(" ?\[[(0-9)]+\]"," ",i.get_text(strip=False)) for i in paras_el]
 			return '. '.join(paras)
 
 	def populatetabledata(self,soup,wikidict):

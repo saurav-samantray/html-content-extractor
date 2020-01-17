@@ -52,4 +52,13 @@ class CrunchbaseExtractor(BaseExtractor):
 				#print(longdescription.get_text(strip=True))
 			crunchdict.update(descriptiondict)
 
+			crunchdict.update(self.getinsights(soup))
+
 			return crunchdict
+
+	def getinsights(self,soup):
+		insightdict = {}
+		#ranking extraction
+		insightphrases = [str(i.text.encode("ascii", "ignore"),'utf-8') for i in soup.find_all('phrase-list-card')]
+		insightdict['insights'] = insightphrases
+		return insightdict

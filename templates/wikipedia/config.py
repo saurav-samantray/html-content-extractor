@@ -1,1 +1,1 @@
-REFERENCE_LIST=["[]"]
+REFERENCE_REGEX=" ?\[[(0-9)]+\]"
