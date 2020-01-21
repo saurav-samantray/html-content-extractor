@@ -1,7 +1,15 @@
 from templates.base import BaseExtractor
 import config
 
+def getrowvalue(x):
+	if x.find('link-formatter') is not None:
+		return x.find('link-formatter').find('a')['href']
+	else:
+		return x.get_text(strip=True)
+
+
 class CrunchbaseExtractor(BaseExtractor):
+
 
 	def extract(self, soup):
 			crunchdict = {}
@@ -30,7 +38,8 @@ class CrunchbaseExtractor(BaseExtractor):
 				for fieldcard in fieldscards:
 					keys_el = fieldcard.find_all('span',attrs={"class":"wrappable-label-with-info ng-star-inserted"})
 					values_el = fieldcard.find_all('field-formatter',attrs={"contexttype":"profile"})
-					values = values + [i.get_text(strip=True) for i in values_el]
+					#values = values + [i.get_text(strip=True) for i in values_el]
+					values = values + list(map(getrowvalue,values_el))
 					keys = keys + [i.get_text(strip=True) for i in keys_el]
 				#print(dict(zip(keys, values)))
 				tablepaneldict = dict(zip(keys, values))

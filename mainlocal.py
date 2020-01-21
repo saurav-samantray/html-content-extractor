@@ -54,7 +54,8 @@ def runtask(retailers,sourcepath):
 		sc.stop()
 		print("Total time taken = {time} seconds".format(time=(etime-stime)))
 		return dict(result)
-	except:
+	except Exception as e:
+		print(e)
 		response = {"success":False,"error":"some error occured"}
 		return response
 
