@@ -1,6 +1,6 @@
-from templates.base import BaseExtractor
-import config
+from base import BaseExtractor
 import re
+import wikiconfig
 
 class WikiExtractor(BaseExtractor):
 

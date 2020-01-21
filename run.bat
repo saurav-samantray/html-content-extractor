@@ -1,0 +1,1 @@
+spark-submit --master spark://10.0.75.1:7077 --executor-memory 8G main.py
