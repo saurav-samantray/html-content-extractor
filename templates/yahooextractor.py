@@ -1,7 +1,5 @@
-from base import BaseExtractor
-import yahooconfig
 
-class YahooExtractor(BaseExtractor):
+class YahooExtractor:
 
 	def getparagraphdump(self,soup):
 		content = soup.find('article')

@@ -1,5 +1,4 @@
-from templates.base import BaseExtractor
-import config
+
 
 def getrowvalue(x):
 	if x.find('link-formatter') is not None:
@@ -8,7 +7,7 @@ def getrowvalue(x):
 		return x.get_text(strip=True)
 
 
-class CrunchbaseExtractor(BaseExtractor):
+class CrunchbaseExtractor:
 
 
 	def extract(self, soup):

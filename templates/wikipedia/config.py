@@ -1,1 +1,0 @@
-REFERENCE_REGEX=" ?\[[(0-9)]+\]"

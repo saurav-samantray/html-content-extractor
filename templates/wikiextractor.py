@@ -1,8 +1,6 @@
-from templates.base import BaseExtractor
-import config
 import re
 
-class WikiExtractor(BaseExtractor):
+class WikiExtractor:
 
 	def getparagraphdump(self,soup):
 		content = soup.find('div',attrs={'id':'mw-content-text'})
