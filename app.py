@@ -7,16 +7,8 @@ app = Flask(__name__)
 
 @app.route("/spark-submit",methods=['POST'])
 def spark_submit():
-    print("Submitting spark job")
-    retailers = None
-    sourcepath = None
-    if request.data:
-    	jsondata =  json.loads(request.data)
-    	retailers = jsondata['retailers']
-    	sourcepath = jsondata['sourcepath']
-    else:
-    	print("Empty request body, using default values configured")
-    result = sparkapp.runtask(retailers,sourcepath)
+    print("Initiating spark job submission")
+    result = sparkapp.runtask(request.args.get('retailers'))
     return result
 
     

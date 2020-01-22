@@ -83,4 +83,4 @@ class TagExtractor:
             bagOfTags = self.removeRetailerName(bagOfTags, json_file.split('.')[0])
             relevantTags = self.getTheRelevantWords(bagOfTags, arrayOfDocuments, json_file.split('.')[0])
             tagsForAllRetailers[json_file.split('.')[0]] = relevantTags[0:25]
-            return json.dumps(tagsForAllRetailers)
+        return json.dumps(tagsForAllRetailers)

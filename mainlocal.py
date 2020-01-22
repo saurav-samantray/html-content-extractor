@@ -14,7 +14,7 @@ from templates.yahoo import extractor as yahooextract
 
 
 
-def runtask(retailers,sourcepath):
+def runtask(retailers):
 	try:
 		conf = SparkConf().setMaster("local").setAppName("RSP1")
 		sc = SparkContext(conf = conf)
@@ -22,7 +22,7 @@ def runtask(retailers,sourcepath):
 
 		stime = time.time()
 		jobid = sc._jsc.sc().applicationId()
-		filepath = sourcepath if sourcepath is not None else config.LOCAL_FILE_PATH
+		filepath = config.LOCAL_FILE_PATH
 		print(f"Created job : {jobid}")
 		print("Current encoding : "+sys.getdefaultencoding())
 		
@@ -30,22 +30,22 @@ def runtask(retailers,sourcepath):
 		lines = sc.textFile(filepath)
 
 		result = None
-		print("lines : ",type(lines))
-		if not lines.isEmpty():
-			if retailers is None or len(retailers) == 0:
-				print("No list provided, processing the complete dump of available names")
-				result = lines\
-				.map(extract)\
-				.reduceByKey(merge_two_dicts)\
-				.collect()
+		#print("lines : ",type(lines))
 
-			else:
-				print(f"Processing records for : {retailers}")
-				result = lines\
-				.filter(lambda x : x.split(config.BRAND_DUMP_DELIMETER)[0] in retailers)\
-				.map(extract)\
-				.reduceByKey(merge_two_dicts)\
-				.collect()
+		if retailers is None or len(retailers) == 0:
+			print("No list provided, processing the complete dump of available names")
+			result = lines\
+			.map(extract)\
+			.reduceByKey(merge_two_dicts)\
+			.collect()
+
+		else:
+			print(f"Processing records for : {retailers}")
+			result = lines\
+			.filter(lambda x : x.split(config.BRAND_DUMP_DELIMETER)[0] in retailers)\
+			.map(extract)\
+			.reduceByKey(merge_two_dicts)\
+			.collect()
 
 		
 		etime = time.time()
