@@ -14,9 +14,7 @@ class TagExtractor:
     def remove_verb_adverb_adjective(self, words):
         verb_container = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'RB', 'RBR', 'RBS', 'RP', 'JJ', 'JJR', 'JJS', 'DT','MD']
         tagged_words = nltk.pos_tag(words)
-        print(tagged_words)
         words_list = [w[0] for w in tagged_words if not w[1] in verb_container]
-        print(words_list)
         return words_list
 
     def removePunctuation(self, words):
