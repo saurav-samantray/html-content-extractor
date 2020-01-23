@@ -13,7 +13,7 @@ class TagExtractor:
 
     def remove_verb_adverb_adjective(self, words):
         verb_container = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'RB', 'RBR', 'RBS', 'RP', 'JJ',
-                            'JJR', 'JJS', 'DT','MD', 'WP', 'WDT', 'WP$']
+                            'JJR', 'JJS', 'DT','MD', 'WP', 'WDT', 'WP$', 'PRP']
         tagged_words = nltk.pos_tag(words)
         words_list = [w[0] for w in tagged_words if not w[1] in verb_container]
         return words_list
@@ -55,8 +55,8 @@ class TagExtractor:
         keywords = []
         stop_words = set(stopwords.words('english'))
         stop_words.update(
-            ["also", "founded", "included", "new", "companies", "com", "including", "customers", "customer","price",
-            "retailer"])
+            ["also", "founded", "included", "new", "companies", "com", "including", "customers", "customer", "price",
+            "retailer", "company"])
         for i in words:
             if i not in stop_words:
                 keywords.append(i)
