@@ -12,7 +12,8 @@ nltk.download('averaged_perceptron_tagger')
 class TagExtractor:
 
     def remove_verb_adverb_adjective(self, words):
-        verb_container = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'RB', 'RBR', 'RBS', 'RP', 'JJ', 'JJR', 'JJS', 'DT','MD']
+        verb_container = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ', 'RB', 'RBR', 'RBS', 'RP', 'JJ',
+                            'JJR', 'JJS', 'DT','MD', 'WP', 'WDT', 'WP$']
         tagged_words = nltk.pos_tag(words)
         words_list = [w[0] for w in tagged_words if not w[1] in verb_container]
         return words_list
@@ -54,7 +55,8 @@ class TagExtractor:
         keywords = []
         stop_words = set(stopwords.words('english'))
         stop_words.update(
-            ["also", "founded", "included", "new", "companies", "com", "including", "customers", "customer"])
+            ["also", "founded", "included", "new", "companies", "com", "including", "customers", "customer","price",
+            "retailer"])
         for i in words:
             if i not in stop_words:
                 keywords.append(i)
@@ -89,11 +91,11 @@ class TagExtractor:
                         arrayOfDocuments.append(refinedText.lower())
                         allTheWords += nltk.word_tokenize(refinedText)
                 bagOfTags = self.removeNonString(allTheWords)
+                bagOfTags = self.lemmatization(bagOfTags)
                 bagOfTags = self.removeStopWords(bagOfTags)
                 bagOfTags = self.remove_verb_adverb_adjective(bagOfTags)
                 bagOfTags = self.removePunctuation(bagOfTags)
                 bagOfTags = self.makeAllWordsSmallCaps(bagOfTags)
-                bagOfTags = self.lemmatization(bagOfTags)
                 bagOfTags = self.removeRetailerName(bagOfTags, json_file.split('.')[0])
                 relevantTags = self.get_the_relevant_words(bagOfTags, arrayOfDocuments, json_file.split('.')[0])
                 tagsForAllRetailers[json_file.split('.')[0]] = relevantTags[0:21]
