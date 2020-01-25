@@ -9,14 +9,20 @@ app = Flask(__name__)
 @app.route("/spark-submit",methods=['POST'])
 def spark_submit():   
     mode = request.args.get('mode')
-    retailer = request.args.get('retailers')
+    retailers = request.args.get('retailers')
+
+    #override with request body if present
+    if request.data:
+        jsondata =  json.loads(request.data)
+        retailers = jsondata['retailers']
+        mode = jsondata['mode']
     result = {}
     if config.MASTER_NODE_MAP.get(mode) is None:
     	return {'success':False,'error':f'{mode} is not a valid input for mode'}
     else:
-    	print(f"Initiating spark job in {mode} mode")
-    	master = config.MASTER_NODE_MAP[mode]
-    	result = sparkapp.runtask(retailer,master)
+        app.logger.info(f'Initiating spark job in {mode} mode')
+        master = config.MASTER_NODE_MAP[mode]
+        result = sparkapp.runtask(retailers,master)
     
     return result
 

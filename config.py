@@ -3,3 +3,4 @@ LOCAL_FILE_PATH="file:///workspace/html-content-extractor/data/dump.txt"
 BRAND_DUMP_DELIMETER='|||||'
 APP_NAME='RSP1'
 MASTER_NODE_MAP={'cluster':'spark://10.0.75.1:7077','local':'local'}
+TAG_EXTRACTOR_URL="http://127.0.0.1:5001/getTags/{brand}"

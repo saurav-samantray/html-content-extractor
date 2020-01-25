@@ -1,11 +1,14 @@
-from pyspark import SparkConf, SparkContext
-import collections, time, html2text, sys
-
-#from lxml import html
-#from lxml.html.clean import Cleaner
-
-from bs4 import BeautifulSoup
 import json
+import collections
+import time
+import sys
+
+import requests
+import html2text
+from pyspark import SparkConf, SparkContext
+from bs4 import BeautifulSoup
+
+
 
 
 
@@ -13,16 +16,23 @@ def runtask(retailers,master):
 	try:
 		conf = SparkConf()\
 		.setMaster(master)\
-		.setAppName("RSP1")
+		.setAppName("RSP1")\
+		.set("spark.cores.max","2")\
+		.set("spark.executor.memory","30g")
 		
 		sc = SparkContext(conf = conf)
 		sc.setLogLevel("WARN")
 		sc.addFile("config.py")
 		sc.addFile("main.py")
-		sc.addFile("templates/baseextractor.py")
-		sc.addFile("templates/crunchextractor.py")
-		sc.addFile("templates/wikiextractor.py")
-		sc.addFile("templates/yahooextractor.py")
+		sc.addFile("html_extractors/baseextractor.py")
+		sc.addFile("html_extractors/crunchextractor.py")
+		sc.addFile("html_extractors/wikiextractor.py")
+		sc.addFile("html_extractors/yahooextractor.py")
+
+		#Initializing the log4J logger from spark context
+		log4jLogger = sc._jvm.org.apache.log4j
+		LOGGER = log4jLogger.LogManager.getLogger(__name__)
+		LOGGER.info("pyspark script logger initialized")
 
 		import config
 		
@@ -30,8 +40,8 @@ def runtask(retailers,master):
 		stime = time.time()
 		jobid = sc._jsc.sc().applicationId()
 		filepath = config.LOCAL_FILE_PATH
-		print(f"Created job : {jobid}")
-		print("Current encoding : "+sys.getdefaultencoding())
+		LOGGER.info(f"Created job : {jobid}")
+		LOGGER.info("Current encoding : "+sys.getdefaultencoding())
 		
 		#read the source content	
 		lines = sc.textFile(filepath)
@@ -40,29 +50,30 @@ def runtask(retailers,master):
 		#print("lines : ",type(lines))
 
 		if retailers is None or len(retailers) == 0:
-			print("No list provided, processing the complete dump of available names")
+			LOGGER.info("No list provided, processing the complete dump of available names")
 			result = lines\
-			.map(extract)\
+			.map(extractkeys)\
 			.reduceByKey(merge_two_dicts)\
+			.map(extracttags)\
 			.collect()
 
 		else:
-			print(f"Processing records for : {retailers}")
+			LOGGER.info(f"Processing records for : {retailers}")
 			result = lines\
 			.filter(lambda x : x.split(config.BRAND_DUMP_DELIMETER)[0] in retailers)\
-			.map(extract)\
+			.map(extractkeys)\
 			.reduceByKey(merge_two_dicts)\
+			.map(extracttags)\
 			.collect()
 
-		
 		etime = time.time()
 		
-		print(jobid+" complete")
+		LOGGER.info(jobid+" complete")
 		sc.stop()
 		print("Total time taken = {time} seconds".format(time=(etime-stime)))
 		return dict(result)
 	except Exception as e:
-		print(e)
+		LOGGER.error(e)
 		response = {"success":False,"error":"some error occured"}
 		return response
 
@@ -73,7 +84,7 @@ def merge_two_dicts(x, y):
     z.update(y)    # modifies z with y's keys and values & returns None
     return z
 
-def extract(row):
+def extractkeys(row):
 	import config
 	import crunchextractor as crunchextract
 	import wikiextractor as wikiextract
@@ -117,6 +128,15 @@ def extract(row):
 	'''
 	return (retailer, retailerdict)
 
+def extracttags(item):
+	import config
+	response = requests.get(config.TAG_EXTRACTOR_URL.format(brand=item[0]))
+	#print(json.loads(response.text))
+	if response.text is not None and len(item)>1:
+		item[1]['tags']= json.loads(response.text).get(item[0])
+		#pass
+	return item
+
 if __name__ == '__main__':
-	print("Initiating spark job in cluster mode")
-	print(runtask(None))
+	LOGGER.info("Initiating spark job in cluster mode")
+	LOGGER.info(runtask(None))
