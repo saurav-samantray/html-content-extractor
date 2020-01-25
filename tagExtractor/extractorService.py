@@ -3,6 +3,7 @@ import numpy as np
 import nltk as nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+from textblob import TextBlob
 nltk.download('stopwords')
 nltk.download('punkt')
 nltk.download('wordnet')
@@ -72,6 +73,21 @@ class TagExtractor:
         processed_dict = {k: v for k, v in sorted(mapOfWords.items(), key=lambda item: item[1], reverse=True)}
         return [*processed_dict]
 
+    def get_noun_phrase_added(self, relevantTags, arrayOfDocuments):
+        array_noun_phrases = []
+        for doc in arrayOfDocuments:
+            blob = TextBlob(doc)
+            for tx in blob.noun_phrases:
+                for tag in relevantTags[0:25]:
+                    if tag in tx:
+                        array_noun_phrases.append(tx.lower())
+        array_noun_phrases_unique = []
+        print(array_noun_phrases)
+        for x in array_noun_phrases:
+            if x not in array_noun_phrases_unique:
+                array_noun_phrases_unique.append(x)
+        return array_noun_phrases_unique
+
     def extractTag(self, brand):
         path = config.FILE_LOCATION
         tagsForAllRetailers = {}
@@ -97,6 +113,8 @@ class TagExtractor:
                 bagOfTags = self.removePunctuation(bagOfTags)
                 bagOfTags = self.makeAllWordsSmallCaps(bagOfTags)
                 bagOfTags = self.removeRetailerName(bagOfTags, json_file.split('.')[0])
-                relevantTags = self.get_the_relevant_words(bagOfTags, arrayOfDocuments, json_file.split('.')[0])
-                tagsForAllRetailers[json_file.split('.')[0]] = relevantTags[0:21]
+                sorted_tags = self.get_the_relevant_words(bagOfTags, arrayOfDocuments, json_file.split('.')[0])
+                tags = self.get_noun_phrase_added(sorted_tags[0:8], arrayOfDocuments)
+                tags.extend(sorted_tags[9:25])
+                tagsForAllRetailers[json_file.split('.')[0]] = tags
         return tagsForAllRetailers
