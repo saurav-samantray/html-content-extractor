@@ -16,9 +16,11 @@ def spark_submit():
         jsondata =  json.loads(request.data)
         retailers = jsondata['retailers']
         mode = jsondata['mode']
+    else:
+        mode = 'local'
     result = {}
     if config.MASTER_NODE_MAP.get(mode) is None:
-    	return {'success':False,'error':f'{mode} is not a valid input for mode'}
+    	return {"success":False,"error":f"{mode} is not a valid input for mode"}
     else:
         app.logger.info(f'Initiating spark job in {mode} mode')
         master = config.MASTER_NODE_MAP[mode]
@@ -28,4 +30,4 @@ def spark_submit():
 
     
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')

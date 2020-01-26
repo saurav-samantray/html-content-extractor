@@ -1,0 +1,58 @@
+create a Dockerfile with below content
+
+'''
+FROM openjdk:8-alpine
+
+RUN apk --update add wget tar bash
+
+RUN wget http://apache.mirror.anlx.net/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz
+
+RUN tar -xzf spark-2.4.4-bin-hadoop2.7.tgz && \
+    mv spark-2.4.4-bin-hadoop2.7 /spark && \
+    rm spark-2.4.4-bin-hadoop2.7.tgz
+
+'''
+
+Build the image file with below command.
+
+docker build -t rsh/spark:latest .
+
+Create a network for master-worker communication from one container to another
+
+docker network create spark_network
+
+
+Run the docker image with below command. It will assign a hostname to the master and open the ports for webUI and Master 
+
+docker run --rm -it --name spark-master --hostname spark-master  -p 7077:7077 -p 8080:8080 --network spark_network  rsh/spark:latest /bin/sh
+
+
+
+Inside the Docker container shell run the below command to start the master
+/spark/bin/spark-class org.apache.spark.deploy.master.Master --ip spark-master --port 7077 --webui-port 8080
+
+
+Run the worker image
+docker run --rm -it --name spark-worker --hostname spark-worker  --network spark_network rsh/spark:latest /bin/sh
+
+start the worker
+/spark/bin/spark-class org.apache.spark.deploy.worker.Worker  --webui-port 8080 spark://spark-master:7077
+
+
+Run the spark Driver
+docker run --rm -it --network spark_network rsh/spark:latest /bin/sh
+
+
+
+=======================================================================
+
+Running the tag generator 
+
+docker run --rm -it --name tag-generator  -p 5001:5001 tag-generator:latest
+
+Running pyspark 
+
+docker run --rm -it --name pyspark --link tag-generator:taggenerator -p 5000:5000 pyspark:latest
+
+
+

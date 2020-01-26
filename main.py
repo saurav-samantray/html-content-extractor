@@ -18,7 +18,7 @@ def runtask(retailers,master):
 		.setMaster(master)\
 		.setAppName("RSP1")\
 		.set("spark.cores.max","2")\
-		.set("spark.executor.memory","30g")
+		.set("spark.executor.memory","1g")
 		
 		sc = SparkContext(conf = conf)
 		sc.setLogLevel("WARN")
@@ -40,13 +40,14 @@ def runtask(retailers,master):
 		stime = time.time()
 		jobid = sc._jsc.sc().applicationId()
 		filepath = config.LOCAL_FILE_PATH
-		LOGGER.info(f"Created job : {jobid}")
-		LOGGER.info("Current encoding : "+sys.getdefaultencoding())
+		print(f"Created job : {jobid}")
+		print(f"Reading file : {filepath} ")
+		print("Current encoding : "+sys.getdefaultencoding())
 		
 		#read the source content	
 		lines = sc.textFile(filepath)
 
-		result = None
+		result = {}
 		#print("lines : ",type(lines))
 
 		if retailers is None or len(retailers) == 0:
