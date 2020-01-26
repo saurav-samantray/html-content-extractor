@@ -48,7 +48,7 @@ docker run --rm -it --network spark_network rsh/spark:latest /bin/sh
 
 Running the tag generator 
 
-docker run --rm -it --name tag-generator  -p 5001:5001 tag-generator:latest
+docker run --rm -it --name tag-generator  -p 5001:5000 tag-generator:latest
 
 Running pyspark 
 

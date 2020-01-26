@@ -16,4 +16,4 @@ def get_tags_for_brand(brand):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')
