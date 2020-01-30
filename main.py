@@ -7,8 +7,8 @@ import requests
 import html2text
 from pyspark import SparkConf, SparkContext
 from bs4 import BeautifulSoup
-
-
+from retailer import Retailer
+import cosmos
 
 
 
@@ -40,8 +40,8 @@ def runtask(retailers,master):
 		stime = time.time()
 		jobid = sc._jsc.sc().applicationId()
 		filepath = config.LOCAL_FILE_PATH
-		print(f"Created job : {jobid}")
-		print(f"Reading file : {filepath} ")
+		print("Created job : {jobid}".format(jobid=jobid))
+		print("Reading file : {filepath} ".format(filepath=filepath))
 		print("Current encoding : "+sys.getdefaultencoding())
 		
 		#read the source content	
@@ -55,24 +55,24 @@ def runtask(retailers,master):
 			result = lines\
 			.map(extractkeys)\
 			.reduceByKey(merge_two_dicts)\
-			.map(extracttags)\
+			.map(update_item)\
 			.collect()
 
 		else:
-			LOGGER.info(f"Processing records for : {retailers}")
+			print("Processing records for : {retailers}".format(retailers=retailers))
 			result = lines\
 			.filter(lambda x : x.split(config.BRAND_DUMP_DELIMETER)[0] in retailers)\
 			.map(extractkeys)\
 			.reduceByKey(merge_two_dicts)\
-			.map(extracttags)\
+			.map(update_item)\
 			.collect()
 
 		etime = time.time()
 		
-		LOGGER.info(jobid+" complete")
+		print(jobid+" complete")
 		sc.stop()
 		print("Total time taken = {time} seconds".format(time=(etime-stime)))
-		return dict(result)
+		#return dict(result)
 	except Exception as e:
 		LOGGER.error(e)
 		response = {"success":False,"error":"some error occured"}
@@ -129,15 +129,25 @@ def extractkeys(row):
 	'''
 	return (retailer, retailerdict)
 
-def extracttags(item):
+def update_item(item):
 	import config
-	response = requests.get(config.TAG_EXTRACTOR_URL.format(brand=item[0]))
-	#print(json.loads(response.text))
-	if response.text is not None and len(item)>1:
-		item[1]['tags']= json.loads(response.text).get(item[0])
-		#pass
+	
+	retailerDoc = Retailer(item[0],item[1])
+	#print(retailerDoc.__dict__)
+	cosmos.create_item(retailerDoc.__dict__)
+	'''
+	try:
+		response = requests.get(config.TAG_EXTRACTOR_URL.format(brand=item[0]))
+		#print(json.loads(response.text))
+		if response.text is not None and len(item)>1:
+			item[1]['tags']= json.loads(response.text).get(item[0])
+			#pass
+	except Exception:
+		print("Error occured while fetching tags. Skipping step")
+	'''
 	return item
+	
 
 if __name__ == '__main__':
-	LOGGER.info("Initiating spark job in cluster mode")
-	LOGGER.info(runtask(None))
+	print("Initiating spark job in local mode")
+	print(runtask(None,'local'))

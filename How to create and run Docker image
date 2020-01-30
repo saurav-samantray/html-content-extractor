@@ -36,7 +36,7 @@ Run the worker image
 docker run --rm -it --name spark-worker --hostname spark-worker  --network spark_network rsh/spark:latest /bin/sh
 
 start the worker
-/spark/bin/spark-class org.apache.spark.deploy.worker.Worker  --webui-port 8080 spark://spark-master:7077
+/spark/bin/spark-class org.apache.spark.deploy.worker.Worker  --webui-port 8081 spark://spark-master:7077
 
 
 Run the spark Driver

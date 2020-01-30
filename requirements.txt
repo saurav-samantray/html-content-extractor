@@ -14,3 +14,6 @@ soupsieve==1.9.5
 Werkzeug==0.16.0
 wincertstore==0.2
 requests
+Cython
+numpy
+azure-cosmos==3.1.2
